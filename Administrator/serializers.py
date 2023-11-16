@@ -5,7 +5,7 @@ class AdministratorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Administrator
 
-        fields = ['first_name', 'last_name', 'gender', 'dob',
+        fields = ['first_name', 'last_name', 'gender', 'dob', 'password',
                   'email', 'phone_no', 'idno', 'role']
         
         extra_kwargs = {
@@ -34,7 +34,7 @@ class AdministratorSerializer(serializers.ModelSerializer):
 class ParentSerializer(serializers.ModelSerializer): 
     class Meta:
         model = Parent
-        fields = ['first_name', 'last_name', 'gender', 'dob',
+        fields = ['first_name', 'last_name', 'gender', 'dob', 'password',
                   'email', 'phone_no', 'location', 'idno', 'role']
         extra_kwargs = {
             "password": {"write_only": True}
@@ -61,7 +61,7 @@ class ParentSerializer(serializers.ModelSerializer):
 class TeacherSerializer(serializers.ModelSerializer): 
     class Meta:
         model = Teacher
-        fields = ['first_name', 'last_name', 'gender', 'dob',
+        fields = ['first_name', 'last_name', 'gender', 'dob', 'password',
                   'email', 'phone_no', 'idno', 'role']
         extra_kwargs = {
             "password": {"write_only": True}
@@ -89,7 +89,7 @@ class TeacherSerializer(serializers.ModelSerializer):
 class DriverSerializer(serializers.ModelSerializer): 
     class Meta:
         model = Driver
-        fields = ['first_name', 'last_name', 'gender', 'dob',
+        fields = ['first_name', 'last_name', 'gender', 'dob', 'password',
                   'email', 'phone_no', 'idno', 'role']
         extra_kwargs = {
             "password": {"write_only": True}
@@ -118,7 +118,7 @@ class MessageSerializer(serializers.Serializer):
 class AdministratorUpdateSerializer(serializers.ModelSerializer): 
     class Meta:
         model = Administrator
-        fields = ['first_name', 'last_name', 'gender', 'dob',
+        fields = ['first_name', 'last_name', 'gender', 'dob', 'password'
                   'email', 'phone_no', 'idno', 'role']
         extra_kwargs = {
             "password": {"write_only": True}

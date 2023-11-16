@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from .serializers import AdministratorSerializer, MessageSerializer
 from .serializers import TeacherSerializer, ParentSerializer, DriverSerializer
 # from .signals import send_verification_email
-from .models import Administrator
+from .models import Administrator, Teacher, Driver, Parent
 # from .sendmails import send_password_reset_email, custom_message
 from rest_framework.response import Response
 from rest_framework import status
@@ -66,8 +66,27 @@ class RegisterAdminApiView(APIView):
 
         # check if password field exists
         password = request.data.get("password")
+        data = {
+            "first_name": request.data.get("first_name").title().strip(),
+            "last_name": request.data.get("last_name").title().strip(),
+            "email": request.data.get("email").strip(),
+            "idno": request.data.get("idno").strip(),
+            "password": request.data.get("password"),
+            "role": request.data.get("role").lower().strip(),
+        }
         if password:
-            user_object = Administrator.objects.get(username=request.data.get("username"))
+            if data["role"] == "admin":
+                user_object = Administrator.objects.get(email=data["email"])
+                serializer = AdministratorSerializer(user_object, data=data)
+            elif data["role"] == "teacher":
+                user_object = Teacher.objects.get(email=data["email"])
+                serializer = TeacherSerializer(user_object, data=request.data)
+            elif data["role"] == "parent":
+                user_object = Driver.objects.get(email=data["email"])
+                serializer = DriverSerializer(user_object, data=request.data)
+            elif data["role"] == "driver":
+                user_object = Parent.objects.get(email=data["email"])
+                serializer = ParentSerializer(user_object, data=request.data)
 
             serializer =AdministratorSerializer(user_object, data=request.data)
             if serializer.is_valid():
@@ -96,13 +115,28 @@ class LoginApiView(APIView):
 
     def post(self, request, *args, **kwargs):
         # change to send the same message as wrong password
-        user = get_object_or_404(Administrator, username=request.data.get("username"))
+        role = request.data.get("role")
+        try:
+            if role == "admin":
+                user_object = Administrator.objects.get(email=request.data.get("email"))
+                serializer = AdministratorSerializer(user_object)
+            elif role == "teacher":
+                user_object = Teacher.objects.get(email=request.data.get("email"))
+                serializer = TeacherSerializer(user_object)
+            elif role == "driver":
+                user_object = Driver.objects.get(email=request.data.get("email"))
+                serializer = DriverSerializer(user_object)
+            elif role == "parent":
+                user_object = Parent.objects.get(email=request.data.get("email"))
+                serializer = ParentSerializer(user_object)
+        except Exception as e:
+            data = {"message": "Invalid User Credentials"}
+            serializer = MessageSerializer(data)
+            return Response(serializer.data, status=status.HTTP_403_FORBIDDEN)
 
-        serializer = AdministratorSerializer(user)
-
-        if user.check_password(request.data.get("password")):
-            user.last_login = timezone.now()
-            user.save()
+        if user_object.check_password(request.data.get("password")):
+            user_object.last_login = timezone.now()
+            user_object.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             data = {"message": "Invalid User Credentials"}
