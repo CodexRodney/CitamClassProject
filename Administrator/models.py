@@ -8,6 +8,17 @@ gender = (
     ("female", "female"),
     )
 
+grades = (
+    ("1", "1"),
+    ("2", "2"),
+    ("3", "3"),
+    ("4", "4"),
+    ("5", "5"),
+    ("6", "6"),
+    ("7", "7"),
+    ("8", "8"),
+)
+
 class Administrator(AbstractUser):
     """
     This is the Administrator table:
@@ -88,3 +99,28 @@ class Driver(AbstractBaseUser):
 
     def __str__(self):
         return self.first_name + self.last_name
+
+
+class ClassRoom(models.Model):
+    """
+    This is the Classroom Table:
+        holds information about a classroom
+    """
+    name = models.CharField(max_length=100, default="")
+    grade = models.CharField(max_length=2, choices=grades, null=False, blank=False)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True)
+
+class Pupil(models.Model):
+    """
+    This is the Pupils Table:
+        holds information about a Pupil
+    """
+    first_name = models.CharField(max_length=100, default="", blank=True)
+    last_name = models.CharField(max_length=100, default="", blank=True)
+    birth_certificate_no = models.CharField(max_length=100, default="", blank=True)
+    class_room = models.ForeignKey(ClassRoom, on_delete=models.CASCADE, null=True)
+    parent = models.ForeignKey(Parent, on_delete=models.CASCADE, blank=False, null=True)
+    graduated = models.BooleanField(default=False) # true if pupil has graduated
+
+
+

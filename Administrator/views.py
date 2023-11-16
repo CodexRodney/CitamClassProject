@@ -81,14 +81,13 @@ class RegisterAdminApiView(APIView):
             elif data["role"] == "teacher":
                 user_object = Teacher.objects.get(email=data["email"])
                 serializer = TeacherSerializer(user_object, data=request.data)
-            elif data["role"] == "parent":
+            elif data["role"] == "driver":
                 user_object = Driver.objects.get(email=data["email"])
                 serializer = DriverSerializer(user_object, data=request.data)
-            elif data["role"] == "driver":
+            elif data["role"] == "parent":
                 user_object = Parent.objects.get(email=data["email"])
                 serializer = ParentSerializer(user_object, data=request.data)
-
-            serializer =AdministratorSerializer(user_object, data=request.data)
+            
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
