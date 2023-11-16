@@ -1,10 +1,10 @@
 from base64 import urlsafe_b64decode
 from django.urls.resolvers import re
 from rest_framework.views import APIView
-from .serializers import AdministratorSerializer, MessageSerializer
+from .serializers import AdministratorSerializer, MessageSerializer, ClassSerializer
 from .serializers import TeacherSerializer, ParentSerializer, DriverSerializer
 # from .signals import send_verification_email
-from .models import Administrator, Teacher, Driver, Parent
+from .models import Administrator, Teacher, Driver, Parent, ClassRoom
 # from .sendmails import send_password_reset_email, custom_message
 from rest_framework.response import Response
 from rest_framework import status
@@ -31,7 +31,7 @@ class RegisterAdminApiView(APIView):
 
     def post(self, request, *args, **kwargs):
         """
-        Create a new Admin
+        Creates teachers, drivers, admins and parents
         """
         data = {
             "first_name": request.data.get("first_name").title().strip(),
@@ -141,6 +141,72 @@ class LoginApiView(APIView):
             data = {"message": "Invalid User Credentials"}
             serializer = MessageSerializer(data)
             return Response(serializer.data, status=status.HTTP_403_FORBIDDEN)
+
+class CreateClassAPI(APIView):
+    """
+    Will hold operations for classes
+    """
+    def get(self, request, *args, **kwargs):
+        """
+        Used to return all classes registered
+        """
+        classrooms = ClassRoom.objects.all()
+        serializer = ClassSerializer(classrooms, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request, *args, **kwargs):
+        """
+        Used To register a Class
+        """
+        if request.data.get("capacity") <= 0 or request.data.get("capacity") is None:
+            data = {"message": "Invalid Data"}
+            serializer = MessageSerializer(data)
+            return Response(serializer.data, status=status.HTTP_403_FORBIDDEN)
+        
+        data = request.data
+        teacher = Teacher.objects.filter(id=data.get("teacher"))
+        if not teacher:
+            data = {"message": "Teacher Not Registered"}
+            serializer = MessageSerializer(data)
+            return Response(serializer.data, status=status.HTTP_403_FORBIDDEN)
+
+
+        serializer = ClassSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, *args, **kwargs):
+        """
+        Used to Update a Class's Info
+        """
+        classroom = ClassRoom.objects.filter(id=request.data.get("id"))
+        data = request.data
+
+
+        if not classroom:
+            data = {"message": "ClassRoom Doesn't Exist"}
+            serializer = MessageSerializer(data)
+            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+        
+        classroom[0].name = data["name"]
+        classroom[0].grade = data["grade"]
+
+        # get the teacher
+        teacher = Teacher.objects.filter(id = data.get("teacher"))
+        if not teacher:
+            data = {"message": "Teacher Not Registered"}
+            serializer = MessageSerializer(data)
+            return Response(serializer.data, status=status.HTTP_403_FORBIDDEN)
+        
+        classroom[0].teacher = teacher[0]
+        classroom[0].capacity = data["capacity"]
+        classroom[0].save()
+
+        return Response(classroom[0].to_json(), status=status.HTTP_200_OK)
+
 
 
 # class ForgetPasswordAPI(APIView):

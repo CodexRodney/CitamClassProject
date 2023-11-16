@@ -1,11 +1,11 @@
-from .models import Administrator, Parent, Teacher, Driver
+from .models import Administrator, Parent, Teacher, Driver, ClassRoom
 from rest_framework import serializers
 
 class AdministratorSerializer(serializers.ModelSerializer): 
     class Meta:
         model = Administrator
 
-        fields = ['first_name', 'last_name', 'gender', 'dob', 'password',
+        fields = ['id', 'first_name', 'last_name', 'gender', 'dob', 'password',
                   'email', 'phone_no', 'idno', 'role']
         
         extra_kwargs = {
@@ -34,7 +34,7 @@ class AdministratorSerializer(serializers.ModelSerializer):
 class ParentSerializer(serializers.ModelSerializer): 
     class Meta:
         model = Parent
-        fields = ['first_name', 'last_name', 'gender', 'dob', 'password',
+        fields = ['id', 'first_name', 'last_name', 'gender', 'dob', 'password',
                   'email', 'phone_no', 'location', 'idno', 'role']
         extra_kwargs = {
             "password": {"write_only": True}
@@ -61,7 +61,7 @@ class ParentSerializer(serializers.ModelSerializer):
 class TeacherSerializer(serializers.ModelSerializer): 
     class Meta:
         model = Teacher
-        fields = ['first_name', 'last_name', 'gender', 'dob', 'password',
+        fields = ['id', 'first_name', 'last_name', 'gender', 'dob', 'password',
                   'email', 'phone_no', 'idno', 'role']
         extra_kwargs = {
             "password": {"write_only": True}
@@ -89,7 +89,7 @@ class TeacherSerializer(serializers.ModelSerializer):
 class DriverSerializer(serializers.ModelSerializer): 
     class Meta:
         model = Driver
-        fields = ['first_name', 'last_name', 'gender', 'dob', 'password',
+        fields = ['id', 'first_name', 'last_name', 'gender', 'dob', 'password',
                   'email', 'phone_no', 'idno', 'role']
         extra_kwargs = {
             "password": {"write_only": True}
@@ -112,6 +112,7 @@ class DriverSerializer(serializers.ModelSerializer):
         instance.set_password(instance.password)
         validated_data["password"] = instance.password
         return super().update(instance, validated_data)
+    
 class MessageSerializer(serializers.Serializer):
     message = serializers.CharField(max_length=100)
 
@@ -123,3 +124,18 @@ class AdministratorUpdateSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "password": {"write_only": True}
         }
+
+class ClassSerializer(serializers.ModelSerializer):
+    # implement for it to return teachers name
+    class Meta:
+        model = ClassRoom
+        fields = ['id', 'name', 'grade', 'capacity', 'teacher']
+    
+    def create(self, validated_data):
+        """
+        Creates a new class from the request's data
+        """
+        classroom = ClassRoom(**validated_data)
+        classroom.save()
+
+        return classroom

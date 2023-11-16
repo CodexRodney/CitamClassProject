@@ -106,9 +106,19 @@ class ClassRoom(models.Model):
     This is the Classroom Table:
         holds information about a classroom
     """
-    name = models.CharField(max_length=100, default="")
+    name = models.CharField(max_length=100, default="", unique=True)
     grade = models.CharField(max_length=2, choices=grades, null=False, blank=False)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True)
+    capacity = models.IntegerField(default=0, blank=False)
+
+    def to_json(self):
+        data = {}
+        data["name"] = self.name
+        data["grade"] = self.grade
+        data["teacher"] = self.teacher.email
+        data["capacity"] = self.capacity
+
+        return data
 
 class Pupil(models.Model):
     """
