@@ -19,87 +19,37 @@ grades = (
     ("8", "8"),
 )
 
-class Administrator(AbstractUser):
+roles = (
+    ("teacher", "teacher"),
+    ("admin", "admin"),
+    ("parent", "parent"),
+    ("driver", "driver"),
+)
+
+class Users(AbstractBaseUser):
     """
     This is the Administrator table:
         holds information about the Administrator
     """
     # fields
-    first_name = models.CharField(max_length=100, default="", blank=True)
-    last_name = models.CharField(max_length=100, default="", blank=True)
+    first_name = models.CharField(max_length=100, default="", blank=False)
+    last_name = models.CharField(max_length=100, default="", blank=False)
     email = models.EmailField(unique=True)
-    gender = models.CharField(max_length=6, choices=gender, default="male")
-    phone_no = models.CharField(max_length=14, default="", blank=True)
+    gender = models.CharField(max_length=6, choices=gender, blank=False)
+    location = models.CharField(max_length=20, blank=False)
+    phone_no = models.CharField(max_length=14, default="", blank=False)
     idno = models.BigIntegerField(null=True)
     dob = models.DateField(default=date(2023, 11, 11))
     role = models.CharField(
-        max_length=20, default="admin"
+        max_length=20,  null=True, choices=roles, blank=False
+    )
+    other_role = models.CharField(
+        max_length=20, default="", blank=True
     )
 
     def __str__(self):
         return self.first_name + self.last_name
     
-class Teacher(AbstractBaseUser):
-    """
-    This is the Teachers table:
-        holds information about the Teacher
-    """
-    # fields
-    first_name = models.CharField(max_length=100, default="", blank=True)
-    last_name = models.CharField(max_length=100, default="", blank=True)
-    email = models.EmailField(unique=True)
-    gender = models.CharField(max_length=6, choices=gender, default="male")
-    phone_no = models.CharField(max_length=14, default="", blank=True)
-    idno = models.BigIntegerField(null=True)
-    dob = models.DateField(default=date(2023, 11, 11))
-    role = models.CharField(
-        max_length=20, default="teacher"
-    )
-
-    def __str__(self):
-        return self.first_name + self.last_name
-
-class Parent(AbstractBaseUser):
-    """
-    This is the Parent table:
-        holds information about the Parent
-    """
-    # fields
-    first_name = models.CharField(max_length=100, default="", blank=True)
-    last_name = models.CharField(max_length=100, default="", blank=True)
-    location = models.CharField(max_length=100, default="", blank=True)
-    email = models.EmailField(unique=True)
-    gender = models.CharField(max_length=6, choices=gender, default="male")
-    phone_no = models.CharField(max_length=14, default="", blank=True)
-    idno = models.BigIntegerField(null=True)
-    dob = models.DateField(default=date(2023, 11, 11))
-    role = models.CharField(
-        max_length=20, default="parent"
-    )
-
-    def __str__(self):
-        return self.first_name + self.last_name
-
-class Driver(AbstractBaseUser):
-    """
-    This is the Driver table:
-        holds information about the Driver
-    """
-    # fields
-    first_name = models.CharField(max_length=100, default="", blank=True)
-    last_name = models.CharField(max_length=100, default="", blank=True)
-    email = models.EmailField(unique=True)
-    gender = models.CharField(max_length=6, choices=gender, default="male")
-    phone_no = models.CharField(max_length=14, default="", blank=True)
-    idno = models.BigIntegerField(null=True)
-    dob = models.DateField(default=date(2023, 11, 11))
-    role = models.CharField(
-        max_length=20, default="driver"
-    )
-
-    def __str__(self):
-        return self.first_name + self.last_name
-
 
 class ClassRoom(models.Model):
     """
@@ -108,7 +58,7 @@ class ClassRoom(models.Model):
     """
     name = models.CharField(max_length=100, default="", unique=True)
     grade = models.CharField(max_length=2, choices=grades, null=False, blank=False)
-    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True)
+    teacher = models.ForeignKey(Users, on_delete=models.CASCADE, null=True)
     capacity = models.IntegerField(default=0, blank=False)
 
     def to_json(self):
@@ -129,7 +79,7 @@ class Pupil(models.Model):
     last_name = models.CharField(max_length=100, default="", blank=True)
     birth_certificate_no = models.CharField(max_length=100, blank=False, unique=True)
     class_room = models.ForeignKey(ClassRoom, on_delete=models.CASCADE, null=True)
-    parent = models.ForeignKey(Parent, on_delete=models.CASCADE, blank=False, null=True)
+    parent = models.ForeignKey(Users, on_delete=models.CASCADE, blank=False, null=True)
     graduated = models.BooleanField(default=False) # true if pupil has graduated
 
     def to_json(self):
