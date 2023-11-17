@@ -2,9 +2,9 @@ from base64 import urlsafe_b64decode
 from django.urls.resolvers import re
 from rest_framework.views import APIView
 from .serializers import AdministratorSerializer, MessageSerializer, ClassSerializer
-from .serializers import TeacherSerializer, ParentSerializer, DriverSerializer
+from .serializers import TeacherSerializer, ParentSerializer, DriverSerializer, PupilSerializer
 # from .signals import send_verification_email
-from .models import Administrator, Teacher, Driver, Parent, ClassRoom
+from .models import Administrator, Teacher, Driver, Parent, ClassRoom, Pupil
 # from .sendmails import send_password_reset_email, custom_message
 from rest_framework.response import Response
 from rest_framework import status
@@ -207,6 +207,66 @@ class CreateClassAPI(APIView):
 
         return Response(classroom[0].to_json(), status=status.HTTP_200_OK)
 
+class PupilsAPI(APIView):
+    """
+    Will hold admin Operations on Student
+    """
+    def get(self, request, *args, **kwargs):
+        """
+        Used to return all classes registered
+        """
+        pupil = Pupil.objects.all()
+        serializer = PupilSerializer(pupil, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request, *args, **kwargs):
+        """
+        Used to register a Kid to A Parent
+        """
+        data = request.data
+        serializer = PupilSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, *args, **kwargs):
+        """
+        Used to Update a Students Information
+        """
+        pupil = Pupil.objects.filter(birth_certificate_no=request.data.get("birth_certificate_no"))
+
+        if not pupil:
+            data = {"message": "Pupil Not Registered"}
+            serializer = MessageSerializer(data)
+            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+        
+        parent = Parent.objects.filter(email=request.data.get("parent_email"))
+
+        if not parent:
+            data = {"message": "Parent Not Registered"}
+            serializer = MessageSerializer(data)
+            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+        
+        classroom = ClassRoom.objects.filter(name=request.data.get("class_room"))
+
+        if not classroom:
+            data = {"message": "ClassRoom Doesn't Exist"}
+            serializer = MessageSerializer(data)
+            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+        
+        pupil[0].first_name = request.data.get("first_name")
+        pupil[0].last_name = request.data.get("last_name")
+        pupil[0].birth_certificate_no = request.data.get("class_room")
+        pupil[0].class_room = classroom[0]
+        pupil[0].parent = parent[0]
+        pupil[0].graduated = request.data.get("graduated")
+
+        return Response(pupil[0].to_json(), status=status.HTTP_200_OK)
+
+
+        
 
 
 # class ForgetPasswordAPI(APIView):

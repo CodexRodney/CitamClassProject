@@ -127,10 +127,20 @@ class Pupil(models.Model):
     """
     first_name = models.CharField(max_length=100, default="", blank=True)
     last_name = models.CharField(max_length=100, default="", blank=True)
-    birth_certificate_no = models.CharField(max_length=100, default="", blank=True)
+    birth_certificate_no = models.CharField(max_length=100, blank=False, unique=True)
     class_room = models.ForeignKey(ClassRoom, on_delete=models.CASCADE, null=True)
     parent = models.ForeignKey(Parent, on_delete=models.CASCADE, blank=False, null=True)
     graduated = models.BooleanField(default=False) # true if pupil has graduated
 
+    def to_json(self):
+        data = {}
+        data["first_name"] = self.first_name
+        data["last_name"] = self.last_name
+        data["birth_certificate_no"] = self.birth_certificate_no
+        data["class_room"] = self.class_room.name
+        data["parent"] = self.parent.email
+        data["graduated"] = self.graduated
+
+        return data
 
 

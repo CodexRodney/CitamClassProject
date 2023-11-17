@@ -1,4 +1,4 @@
-from .models import Administrator, Parent, Teacher, Driver, ClassRoom
+from .models import Administrator, Parent, Teacher, Driver, ClassRoom, Pupil
 from rest_framework import serializers
 
 class AdministratorSerializer(serializers.ModelSerializer): 
@@ -139,3 +139,18 @@ class ClassSerializer(serializers.ModelSerializer):
         classroom.save()
 
         return classroom
+    
+class PupilSerializer(serializers.ModelSerializer):
+    # implement for it to return teachers name
+    class Meta:
+        model = Pupil
+        fields = ['id', 'first_name', 'last_name', 'birth_certificate_no', 'class_room', 'parent', 'graduated']
+    
+    def create(self, validated_data):
+        """
+        Creates a new class from the request's data
+        """
+        pupil = Pupil(**validated_data)
+        pupil.save()
+
+        return pupil
