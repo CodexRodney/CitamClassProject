@@ -21,7 +21,7 @@ class ClassesAPIView(APIView):
         if not teacher or teacher[0].role != "teacher" and not ("teacher" in teacher[0].other_role):
             data = {"message": "Teacher Doesn't Exist"}
             serializer = MessageSerializer(data)
-            return Response(serializer.data, status=status.HTTP_403_FORBIDDEN)
+            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
         
         classes = ClassRoom.objects.filter(teacher=teacher[0])
         serializer = ClassSerializer(classes, many=True)
@@ -41,7 +41,7 @@ class ListStudentsAPIView(APIView):
           if not classroom:
             data = {"message": "Teacher Doesn't Exist"}
             serializer = MessageSerializer(data)
-            return Response(serializer.data, status=status.HTTP_403_FORBIDDEN)
+            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
           
           # get a list of all students in the requested class
           pupils = Pupil.objects.filter(class_room=classroom[0])
@@ -70,4 +70,24 @@ class PromoteStudentAPIView(APIView):
     """
     Used to Promote Students by Teachers
     """
-    pass
+    def post(self, request, *args, **kwargs):
+        """
+        Used to Promote a student to the next class
+        """
+        pupil = Pupil.objects.filter(birth_certficate_no=request.data.get("birth_certificate_no"))
+        classroom = ClassRoom.objects.filter(class_name=request.data.get("classname"))
+
+        if not pupil:
+            data = {"message": "Pupil Doesn't Exist"}
+            serializer = MessageSerializer(data)
+            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not classroom:
+            data = {"message": "Class Doesn't Exist"}
+            serializer = MessageSerializer(data)
+            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+        
+        pupil[0].class_room = classroom[0]
+        pupil[0].save()
+
+        return Response({"message": "Student Promoted Successfully"}, status=status.HTTP_200_OK)
