@@ -1,4 +1,4 @@
-from .models import Users, ClassRoom, Pupil
+from .models import Users, ClassRoom, Pupil, DropOuts
 from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer): 
@@ -71,3 +71,18 @@ class PupilSerializer(serializers.ModelSerializer):
         pupil.save()
 
         return pupil
+    
+class DropOutsSerializer(serializers.ModelSerializer):
+    # implement for it to return teachers name
+    class Meta:
+        model = DropOuts
+        fields = ['id', 'pickup_time', 'dropoff_time', 'stage']
+    
+    def create(self, validated_data):
+        """
+        Creates a new class from the request's data
+        """
+        dropout = DropOuts(**validated_data)
+        dropout.save()
+
+        return dropout

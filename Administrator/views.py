@@ -2,7 +2,7 @@ from base64 import urlsafe_b64decode
 from django.urls.resolvers import re
 from rest_framework.views import APIView
 from .serializers import UserSerializer, MessageSerializer, UserUpdateSerializer, ClassSerializer
-from .serializers import PupilSerializer
+from .serializers import PupilSerializer, DropOutsSerializer
 # from .signals import send_verification_email
 from .models import Users, ClassRoom, Pupil
 # from .sendmails import send_password_reset_email, custom_message
@@ -266,6 +266,29 @@ class PupilsAPI(APIView):
         pupil[0].graduated = request.data.get("graduated")
 
         return Response(pupil[0].to_json(), status=status.HTTP_200_OK)
+
+class DropOffLocations(APIView):
+    """
+    Used To Handle DropOffs
+    """
+    def post(self, request, *args, **kwargs):
+        """
+        Used to add dropoffs 
+        """
+        data = request.data
+
+        serializer = DropOutsSerializer(data=data)
+        if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "Attendance Successfully Marked"}, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def put(self, request, *args, **kwargs):
+        """
+        Used to Update Dropouts 
+        """
+        pass
 
 
         

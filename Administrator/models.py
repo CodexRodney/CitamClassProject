@@ -93,4 +93,10 @@ class Pupil(models.Model):
 
         return data
 
-
+class DropOuts(models.Model):
+    """
+    Will Hold Informations About DropOffs
+    """
+    pickup_time = models.TimeField(blank=False)
+    dropoff_time = models.TimeField(blank=False)
+    stage = models.CharField(max_length=100, null=True, blank=False)
