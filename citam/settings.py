@@ -40,7 +40,8 @@ INSTALLED_APPS = [
 
     # custom apps
     'Administrator.apps.AdministratorConfig',
-    'teachers.apps.TeachersConfig'
+    'teachers.apps.TeachersConfig',
+    'dbvms.apps.DbvmsConfig'
 ]
 
 MIDDLEWARE = [

@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('administrator/', include('Administrator.urls')),
     path('teachers/', include('teachers.urls')),
+    path('dvbs/', include('dbvms.urls')),
 ]

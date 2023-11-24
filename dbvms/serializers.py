@@ -5,9 +5,9 @@ class EventSerializer(serializers.ModelSerializer):
     # implement for it to return teachers name
     class Meta:
         model = Event
-        fields = ['parent_email', 'parent_name', 'parent_phone_number', 'children',
+        fields = ['parent_email', 'parent_name', 'parent_phone_number', 'pupil',
                   'need_tranport', 'parent_location', 'prnt_cfrm_pickup', 'tchr_cfrm_received',
-                  'tchr_cfrm_released', 'prnt_cfrm_dropped', 'dbvms_year']
+                  'tchr_cfrm_released', 'prnt_cfrm_dropped', 'dbvms_year', 'teacher_id', 'grade']
     
     def create(self, validated_data):
         """

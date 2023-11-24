@@ -44,6 +44,7 @@ class RegisterUsersApiView(APIView):
             "role": request.data.get("role").lower().strip(),
             "gender": request.data.get("gender").lower().strip()
         }
+        
         serializer = UserSerializer(data=data)
         
         if serializer.is_valid():
