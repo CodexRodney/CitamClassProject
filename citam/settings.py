@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure--c*0!g7h!60t&s9s0&+n2ih&wf*k#m5=v*9aof8c*6l6icai=_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -43,6 +43,11 @@ INSTALLED_APPS = [
     'teachers.apps.TeachersConfig',
     'dbvms.apps.DbvmsConfig'
 ]
+
+# Allowed Cors
+CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOWED_ORIGINS = ['*']
+CORS_ALLOW_CREDENTIALS = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
